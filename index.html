@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NexusFun</title>
+  <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.20.6/babel.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: 'Orbitron', sans-serif; }
+    .glow-correct { animation: glow 0.5s ease-in-out; }
+    @keyframes glow { 0% { box-shadow: 0 0 10px #22C55E; } 100% { box-shadow: 0 0 0px #22C55E; } }
+  </style>
+</head>
+<body class="min-h-screen transition-colors duration-300">
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    const questions = [
+      { id: 1, text: "What is the primary vision of Nexus?", options: ["A modular Layer 2 solution for Ethereum", "A planetary-scale supercomputer on a single verifiable blockchain", "A centralized AI cloud provider", "A quantum encryption platform"], answer: "B" },
+      { id: 2, text: "Which of the following best describes the Universal Proof?", options: ["A proof of stake system for block validation", "A single, succinct proof that compresses all verifiable computation into one global truth", "An AI consensus algorithm for orchestrators", "A hashing mechanism for storage nodes"], answer: "B" },
+      { id: 3, text: "Which core property is not part of the Nexus IVC machine?", options: ["Incremental verifiability", "Recursive aggregation", "Global parallelism", "Single-thread execution"], answer: "D" },
+      { id: 4, text: "In Nexus, the Execution Layer is primarily responsible for:", options: ["Coordinating proof verification and distributing rewards", "Running transactions and smart contracts while producing verifiable proofs", "Storing cryptographic data", "Determining gas prices for network usage"], answer: "B" },
+      { id: 5, text: "What is the role of Orchestrators in the Execution Layer?", options: ["Provide storage redundancy", "Coordinate delegators, aggregate proofs, and maintain throughput", "Validate token transfers", "Handle cross-chain bridging"], answer: "B" },
+      { id: 6, text: "Which consensus mechanism is used in Nexus' early phase?", options: ["HotStuff-2", "Proof of Work", "Tendermint-based consensus with delegated staking", "Raft consensus"], answer: "C" },
+      { id: 7, text: "The long-term target for the Consensus Layer is:", options: ["A $100 million staked threshold", "256^4 globally distributed validator nodes", "1 million validators with delegated staking", "A fully centralized orchestrator system"], answer: "B" },
+      { id: 8, text: "Which of the following is a function of the Consensus Layer?", options: ["Compress all computation into a single proof", "Synchronize global transactions and ratify the Universal Proof", "Store historical block data", "Manage zkVM upgrades"], answer: "B" },
+      { id: 9, text: "The Storage Layer in Nexus will ultimately use which key technique for verifiability?", options: ["Proof of Capacity", "Hyper-dimensional encoding paired with Data Availability Sampling (DAS)", "Merkle trie hashing only", "Encrypted sharding"], answer: "B" },
+      { id: 10, text: "In Mainnet Season 1, the Storage Layer will operate in which mode?", options: ["Data availability sampling", "Replicated storage", "Delegated proof generation", "Encrypted proof offloading"], answer: "B" },
+      { id: 11, text: "What is the primary economic target for the Storage Layer?", options: ["$1 trillion staked", "$500 million in liquidity pools", "$100B+ in staking for storage nodes", "$10B+ in gas fee revenue"], answer: "C" },
+      { id: 12, text: "Which feature allows AI models to be audited without exposing training data?", options: ["Recursive delegation", "Zero-knowledge proofs (ZKPs)", "Tendermint consensus", "HotStuff-2 protocol"], answer: "B" },
+      { id: 13, text: "Which is not a stated capability of the Nexus Explorer?", options: ["Monitor token transfers", "Verify smart contracts", "Execute on-chain transactions directly", "Track Layer 1 ↔ Layer 2 deposits and withdrawals"], answer: "C" },
+      { id: 14, text: "What is the reward mechanism for node participation in the Nexus testnet?", options: ["Ethereum tokens", "NEX Testnet Points convertible into NEX Testnet Tokens", "Stablecoins pegged to USD", "NFTs representing compute power"], answer: "B" },
+      { id: 15, text: "Which is not part of the Nexus node participation workflow?", options: ["Proof creation via zkVM", "Submission to Orchestrator for verification", "On-chain liquidity provisioning", "Earning NEX Testnet Points after verification"], answer: "C" },
+      { id: 16, text: "What allows Nexus to scale verification with constant cost despite increased computation?", options: ["Sharding", "Recursive aggregation of proofs", "Proof of Capacity", "ZK-SNARK compression"], answer: "B" },
+      { id: 17, text: "Which API interfaces will the Nexus Explorer support?", options: ["REST, GraphQL, RPC, and Ethereum-compatible RPC", "Only GraphQL", "Only REST", "JSON-RPC over WebSockets only"], answer: "A" },
+      { id: 18, text: "What distinguishes the Nexus architecture from fragmented rollups?", options: ["Use of modular consensus layers", "A single unified chain for all global computation", "Private validator committees", "Transaction batching without proofs"], answer: "B" },
+      { id: 19, text: "In the context of the Consensus Layer, what does 'capital layering' refer to?", options: ["Using multiple currencies for staking", "Structuring validator roles in nested security rings with economic guarantees", "Storing capital in multiple storage shards", "Prioritizing transactions by fee tiers"], answer: "B" },
+      { id: 20, text: "The long-term vision of Nexus enables:", options: ["AI agents that can reason, transact, and interact securely with humans and each other", "Proof-of-work mining farms for compute-intensive models", "Purely centralized supercomputing hubs", "Blockchain systems without consensus"], answer: "A" },
+      { id: 21, text: "What does the Nexus zkVM primarily do?", options: ["Generates zero-knowledge proofs for computations", "Stores user private keys", "Mines cryptocurrency", "Compresses video files"], answer: "A" },
+      { id: 22, text: "Which of these is not part of the Nexus Layer 1 architecture?", options: ["Execution Layer", "Consensus Layer", "Storage Layer", "Mining Layer"], answer: "D" },
+      { id: 23, text: "The Nexus Execution Layer is based on which core cryptographic principle?", options: ["Proof of Work", "Incrementally Verifiable Computation (IVC)", "Merkle Trees", "SHA-256 hashing"], answer: "B" },
+      { id: 24, text: "In Nexus, what is a 'Delegator' node responsible for?", options: ["Creating and aggregating proofs from other nodes", "Executing tasks and producing zero-knowledge proofs", "Approving transactions manually", "Distributing tokens to validators"], answer: "B" },
+      { id: 25, text: "Which future upgrade will enhance the Nexus zkVM’s capabilities?", options: ["More efficient proof recursion", "Larger block sizes", "Higher gas fees", "Slower verification for safety"], answer: "A" },
+      { id: 26, text: "What’s the main benefit of recursive proof aggregation in Nexus?", options: ["Lower token price volatility", "Constant verification cost despite higher throughput", "Increased mining difficulty", "Faster block times without consensus"], answer: "B" },
+      { id: 27, text: "The Nexus Orchestrator will eventually become:", options: ["Fully centralized for maximum speed", "A permissionless market for proof coordination", "A government-regulated service", "A private data store"], answer: "B" },
+      { id: 28, text: "Which of the following best describes 'Global Parallelism' in Nexus?", options: ["One node doing all computation", "Computation spread across a mesh of nodes for scale", "Sequential execution of all transactions", "Proof aggregation in a single validator"], answer: "B" },
+      { id: 29, text: "In Nexus' vision, the Universal Proof is:", options: ["A marketing slogan for high-speed transactions", "A proof of all computation, verifiable by anyone", "A new type of validator hardware", "A blockchain explorer feature"], answer: "B" },
+      { id: 30, text: "Which component manages validator rotation in later Consensus Layer phases?", options: ["Orchestrators", "HotStuff-2 protocol", "Proof Trees", "Gas Tracker"], answer: "B" },
+      { id: 31, text: "In the Nexus Storage Layer, hyper-dimensional encoding allows:", options: ["Faster web browsing", "Distributed data representation with cryptographic security", "GPU mining efficiency", "Token minting automation"], answer: "B" },
+      { id: 32, text: "Data Availability Sampling (DAS) ensures:", options: ["Validators store all data", "Clients can verify data availability without downloading everything", "Proofs are compressed faster", "AI models train in parallel"], answer: "B" },
+      { id: 33, text: "What is the function of NEX Testnet Points?", options: ["Voting on governance proposals", "Convertible into NEX Testnet Tokens as rewards", "Used for storage payments", "Locked in smart contracts permanently"], answer: "B" },
+      { id: 34, text: "What is one advantage of Nexus over fragmented rollups?", options: ["Lower marketing costs", "A single unified chain for all global computation", "Simpler consensus without staking", "No need for proof verification"], answer: "B" },
+      { id: 35, text: "Which of these can Nexus verify without revealing the original inputs?", options: ["Blockchain consensus rules", "AI model computations", "Website passwords", "Hardware specifications"], answer: "B" },
+      { id: 36, text: "The target staking threshold for the Consensus Layer’s economic security is:", options: ["$100B", "$1T", "$500M", "$10B"], answer: "B" },
+      { id: 37, text: "Which phase of the Storage Layer introduces storage orchestrators with delegated staking?", options: ["Mainnet Season 1", "Mainnet Season 2", "Mainnet Season ∞", "Testnet Phase 1"], answer: "B" },
+      { id: 38, text: "What makes the Nexus Execution Layer suitable for AI agents?", options: ["It requires no consensus", "It can securely verify agent actions at scale", "It only stores model weights", "It uses centralized data pipelines"], answer: "B" },
+      { id: 39, text: "Which explorer feature helps track assets moving between L1 and L2?", options: ["Cross-Layer Tracking", "Token Registry", "Proof Tree Visualizer", "Validator Dashboard"], answer: "A" },
+      { id: 40, text: "Why are cryptographic proofs essential in the AI era, according to Nexus?", options: ["They increase mining profitability", "They replace all governance voting", "They provide guarantees instead of assumptions about computation correctness", "They speed up internet browsing"], answer: "C" }
+    ];
+
+    const funFacts = {
+      1: "Nexus aims to make computation verifiable at a planetary scale, uniting AI and blockchain!",
+      2: "The Universal Proof is like a cosmic truth certificate for all Nexus computations.",
+      3: "Nexus' IVC machine thrives on parallel, verifiable processes, not single-threaded limits!",
+      4: "The Execution Layer is the heart of Nexus, running smart contracts with proof power.",
+      5: "Orchestrators are the conductors of Nexus’ computational symphony!",
+      6: "Tendermint powers Nexus’ early consensus, balancing speed and security.",
+      7: "256^4 nodes is a mind-boggling number, aiming for global validator scale!",
+      8: "The Consensus Layer keeps Nexus ticking in sync across the globe.",
+      9: "Hyper-dimensional encoding sounds sci-fi, but it’s key to Nexus’ storage future!",
+      10: "Replicated storage in Season 1 ensures Nexus’ data is always available.",
+      11: "$100B+ in staking shows Nexus’ ambition for massive economic security!",
+      12: "ZKPs let Nexus audit AI models while keeping data private—pretty cool, right?",
+      13: "Nexus Explorer is your window into the blockchain, but it won’t execute transactions!",
+      14: "NEX Testnet Points are like arcade tokens for Nexus’ testnet players!",
+      15: "Liquidity provisioning isn’t part of Nexus’ node workflow—focus is on proofs!",
+      16: "Recursive aggregation keeps Nexus’ verification costs low, no matter the scale.",
+      17: "Nexus Explorer’s API support makes it a developer’s dream for Web3 integration.",
+      18: "Nexus’ unified chain avoids the mess of fragmented rollups—clean and simple!",
+      19: "Capital layering in Nexus is like building a fortress of economic security.",
+      20: "Nexus envisions AI agents as trusted partners in a secure, verifiable world.",
+      21: "The Nexus zkVM is all about generating proofs to ensure computational trust!",
+      22: "No mining layer in Nexus—it's all about verifiable computation layers!",
+      23: "IVC is the cryptographic backbone of Nexus’ scalable execution layer.",
+      24: "Delegator nodes are the workhorses producing proofs for Nexus’ network.",
+      25: "Efficient proof recursion will turbocharge Nexus’ zkVM in future upgrades!",
+      26: "Recursive proof aggregation keeps Nexus’ verification costs steady as it grows.",
+      27: "A permissionless Orchestrator market will make Nexus open and decentralized!",
+      28: "Global Parallelism spreads Nexus’ computation across a global node mesh.",
+      29: "The Universal Proof is Nexus’ vision of a single, verifiable truth for all compute.",
+      30: "HotStuff-2 will streamline validator rotation in Nexus’ later phases.",
+      31: "Hyper-dimensional encoding secures Nexus’ data in a distributed, futuristic way!",
+      32: "DAS lets Nexus verify data availability without downloading the whole blockchain.",
+      33: "NEX Testnet Points are your ticket to rewards in Nexus’ testnet phase!",
+      34: "Nexus’ unified chain simplifies computation compared to scattered rollups.",
+      35: "Nexus verifies AI computations securely without exposing sensitive inputs!",
+      36: "$1T staking is Nexus’ bold goal for unshakeable Consensus Layer security.",
+      37: "Mainnet Season 2 brings storage orchestrators to Nexus’ decentralized storage game.",
+      38: "Nexus’ Execution Layer is built to verify AI agent actions at massive scale.",
+      39: "Cross-Layer Tracking in Nexus Explorer follows assets between L1 and L2 seamlessly.",
+      40: "Cryptographic proofs in Nexus ensure AI computations are trustworthy, not assumed!"
+    };
+
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    function getRandomQuestions() {
+      const shuffled = shuffle([...questions]);
+      return shuffled.slice(0, 10);
+    }
+
+    function Navbar({ toggleTheme, isDarkMode }) {
+      return (
+        <nav className="bg-blue-900 dark:bg-blue-950 p-4 flex justify-between items-center">
+          <h1 className="text-2xl font-bold text-green-400 dark:text-green-500">NexusFun</h1>
+          <button
+            onClick={toggleTheme}
+            className="p-2 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600 transition"
+            aria-label={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+          >
+            {isDarkMode ? (
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+              </svg>
+            ) : (
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+              </svg>
+            )}
+          </button>
+        </nav>
+      );
+    }
+
+    function Landing({ startQuiz }) {
+      return (
+        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 p-4">
+          <h1 className="text-5xl font-bold mb-4 text-blue-900 dark:text-green-500">Welcome to NexusFun!</h1>
+          <p className="text-xl mb-8 text-center max-w-2xl text-gray-700 dark:text-gray-300">
+            Test your Nexus knowledge and climb the leaderboard! Learn about the planetary-scale verifiable supercomputer
+            in a fun, competitive way.
+          </p>
+          <button
+            onClick={startQuiz}
+            className="px-8 py-4 bg-green-400 dark:bg-green-500 text-black dark:text-gray-900 text-lg font-bold rounded-full hover:bg-green-500 dark:hover:bg-green-600 transition"
+          >
+            Start Quiz
+          </button>
+        </div>
+      );
+    }
+
+    function Quiz({ questions, setScore, setShowResults, userId }) {
+      const [currentQuestion, setCurrentQuestion] = useState(0);
+      const [selectedAnswer, setSelectedAnswer] = useState(null);
+      const [feedback, setFeedback] = useState(null);
+      const [timeLeft, setTimeLeft] = useState(30);
+      const [localScore, setLocalScore] = useState(0);
+
+      useEffect(() => {
+        if (timeLeft > 0 && !feedback) {
+          const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
+          return () => clearTimeout(timer);
+        } else if (timeLeft === 0 && !feedback) {
+          handleAnswer(null);
+        }
+      }, [timeLeft, feedback]);
+
+      const handleAnswer = (answer) => {
+        const isCorrect = answer === questions[currentQuestion].answer;
+        setFeedback({
+          isCorrect,
+          correctAnswer: questions[currentQuestion].answer,
+          funFact: funFacts[questions[currentQuestion].id]
+        });
+        if (isCorrect) {
+          setLocalScore(localScore + 1);
+          if (answer) {
+            const button = document.getElementById(`option-${answer}`);
+            if (button) button.classList.add('glow-correct');
+          }
+        }
+        setTimeout(() => {
+          if (currentQuestion < questions.length - 1) {
+            setCurrentQuestion(currentQuestion + 1);
+            setSelectedAnswer(null);
+            setFeedback(null);
+            setTimeLeft(30);
+          } else {
+            setScore(localScore + (isCorrect ? 1 : 0));
+            setShowResults(true);
+            if (isCorrect && answer) {
+              confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+            }
+          }
+        }, 2000);
+      };
+
+      return (
+        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900 p-4">
+          <div className="w-full max-w-2xl bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+            <div className="flex justify-between mb-4">
+              <p className="text-lg text-gray-900 dark:text-gray-100">Question {currentQuestion + 1} of {questions.length}</p>
+              <p className="text-lg text-gray-900 dark:text-gray-100">Time: {timeLeft}s</p>
+            </div>
+            <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-gray-100">{questions[currentQuestion].text}</h2>
+            <div className="space-y-4">
+              {questions[currentQuestion].options.map((option, index) => (
+                <button
+                  key={index}
+                  id={`option-${String.fromCharCode(65 + index)}`}
+                  className={`w-full p-4 text-left rounded-lg border ${
+                    selectedAnswer === String.fromCharCode(65 + index)
+                      ? feedback && feedback.isCorrect
+                        ? 'bg-green-400 dark:bg-green-500 text-black dark:text-gray-900'
+                        : feedback && !feedback.isCorrect
+                        ? 'bg-red-500 text-white'
+                        : 'bg-blue-500 text-white'
+                      : 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100'
+                  } hover:bg-blue-400 dark:hover:bg-blue-600 transition`}
+                  onClick={() => {
+                    if (!feedback) {
+                      setSelectedAnswer(String.fromCharCode(65 + index));
+                      handleAnswer(String.fromCharCode(65 + index));
+                    }
+                  }}
+                  disabled={feedback}
+                >
+                  {String.fromCharCode(65 + index)}. {option}
+                </button>
+              ))}
+            </div>
+            {feedback && (
+              <div className="mt-4 p-4 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                <p className={feedback.isCorrect ? 'text-green-500 dark:text-green-400' : 'text-red-500'}>
+                  {feedback.isCorrect ? 'Correct!' : `Incorrect. The correct answer is ${feedback.correctAnswer}.`}
+                </p>
+                <p className="mt-2 text-gray-900 dark:text-gray-100">{feedback.funFact}</p>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    function Results({ score, questions, userId, resetQuiz }) {
+      const [leaderboard, setLeaderboard] = useState([]);
+
+      useEffect(() => {
+        const storedLeaderboard = JSON.parse(localStorage.getItem('leaderboard') || '[]');
+        const newEntry = {
+          userId: `User-${userId}`,
+          score,
+          timestamp: new Date().toISOString()
+        };
+        const updatedLeaderboard = [...storedLeaderboard, newEntry].sort((a, b) => b.score - a.score).slice(0, 10);
+        localStorage.setItem('leaderboard', JSON.stringify(updatedLeaderboard));
+        setLeaderboard(updatedLeaderboard);
+        confetti({ particleCount: 200, spread: 90, origin: { y: 0.6 } });
+      }, [score, userId]);
+
+      return (
+        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900 p-4">
+          <div className="w-full max-w-2xl bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg text-center">
+            <h2 className="text-3xl font-bold mb-4 text-blue-900 dark:text-green-500">Quiz Complete!</h2>
+            <p className="text-xl mb-4 text-gray-900 dark:text-gray-100">
+              Your Score: {score} out of {questions.length} ({((score / questions.length) * 100).toFixed(2)}%)
+            </p>
+            <p className="mb-4 text-gray-900 dark:text-gray-100">Rank: {leaderboard.findIndex(entry => entry.userId === `User-${userId}` && entry.score === score) + 1}</p>
+            <h3 className="text-xl font-bold mb-2 text-gray-900 dark:text-gray-100">Leaderboard</h3>
+            <ul className="mb-4 text-gray-900 dark:text-gray-100">
+              {leaderboard.map((entry, index) => (
+                <li key={index} className="py-1">
+                  {index + 1}. {entry.userId} - {entry.score}/{questions.length}
+                </li>
+              ))}
+            </ul>
+            <button
+              onClick={resetQuiz}
+              className="px-8 py-4 bg-green-400 dark:bg-green-500 text-black dark:text-gray-900 text-lg font-bold rounded-full hover:bg-green-500 dark:hover:bg-green-600 transition"
+            >
+              Play Again
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    function App() {
+      const [quizStarted, setQuizStarted] = useState(false);
+      const [showResults, setShowResults] = useState(false);
+      const [score, setScore] = useState(0);
+      const [isDarkMode, setIsDarkMode] = useState(true);
+      const [currentQuestions, setCurrentQuestions] = useState([]);
+      const [userId, setUserId] = useState(Math.random().toString(36).substring(2, 10));
+
+      useEffect(() => {
+        if (quizStarted && !showResults) {
+          setCurrentQuestions(getRandomQuestions());
+        }
+      }, [quizStarted]);
+
+      useEffect(() => {
+        document.documentElement.classList.toggle('dark', isDarkMode);
+      }, [isDarkMode]);
+
+      const startQuiz = () => {
+        setQuizStarted(true);
+        setShowResults(false);
+        setScore(0);
+        setCurrentQuestions(getRandomQuestions());
+        setUserId(Math.random().toString(36).substring(2, 10));
+      };
+
+      const resetQuiz = () => {
+        setQuizStarted(false);
+        setShowResults(false);
+        setScore(0);
+      };
+
+      const toggleTheme = () => {
+        setIsDarkMode(!isDarkMode);
+      };
+
+      return (
+        <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
+          <Navbar toggleTheme={toggleTheme} isDarkMode={isDarkMode} />
+          {!quizStarted && <Landing startQuiz={startQuiz} />}
+          {quizStarted && !showResults && (
+            <Quiz questions={currentQuestions} setScore={setScore} setShowResults={setShowResults} userId={userId} />
+          )}
+          {showResults && <Results score={score} questions={currentQuestions} userId={userId} resetQuiz={resetQuiz} />}
+        </div>
+      );
+    }
+
+    ReactDOM.render(<App />, document.getElementById('root'));
+  </script>
+</body>
+</html>
